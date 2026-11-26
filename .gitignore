@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+state/
+data/
+reports/
+ideas/
+*.sqlite*
+*.env
+*.app/
+node_modules/
