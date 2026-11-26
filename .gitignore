@@ -8,3 +8,4 @@ ideas/
 *.env
 *.app/
 node_modules/
+roots.json

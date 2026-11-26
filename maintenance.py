@@ -10,16 +10,23 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 from db import APP, PORTABLE, ROOT, STATE, MODEL, backup, connect, dump, embed_batches, get_setting, idea_get, now, run_record, setting
-from sources import HOME, DESKTOP, COURSES, RESEARCH, sync_files, sync_zotero
+from sources import HOME, sync_files, sync_zotero
 from discovery import collect, maturity, proposals
 from portable import publish, publish_ideas, release_archived_backup_cache
 
 def roots():
-    return {
+    defaults = {
         "idea": [str(ROOT)],
         "research": [p for p in os.environ.get("RESEARCH_IDEAS_RESEARCH_PATHS", "").split(os.pathsep) if p],
         "course": [p for p in os.environ.get("RESEARCH_IDEAS_COURSE_PATHS", "").split(os.pathsep) if p],
     }
+    config = APP / "roots.json"
+    if config.exists():
+        for feed, values in json.loads(config.read_text()).items():
+            if feed in defaults:
+                defaults[feed].extend(values)
+    return {feed: list(dict.fromkeys(Path(path).expanduser() for path in values))
+            for feed, values in defaults.items()}
 
 def watch_plan():
     watched={str(p.resolve()) for items in roots().values() for p in items}
